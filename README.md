@@ -1,1 +1,2 @@
-!["Resultados de la imagen"](git_images/resultados.png)
+![Resultados](git_images/resultados.png)
+
