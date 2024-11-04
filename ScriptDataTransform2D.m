@@ -39,7 +39,7 @@ K(2:2:end) = obs(:,6);
 x = inv(A'*A)*A'*K; 
 rotacion = x(2)/x(1);
 escala = x(2)/sin(rotacion);
-disp('Parametros iniciales [α, L, Tx, Ty]:');
+disp('VALORES INICIALES [α, L, Tx, Ty]:');
 rotacion = atan2(x(2),x(1));
 rotacion_deg = rad2deg(rotacion);
 escala = x(2)/sin(rotacion);
@@ -135,10 +135,19 @@ chi2_1 = chi2inv(1-alpha/2, 2*c-n);
 
 
 disp("-------------------------------------------")
-
+fprintf("RESULTADOS [α, L, Tx, Ty]:\n")
 %Condicional por el que se hace el contraste de hipótesis
 %H0: varianza a priori = varianza a posteriori
 %H1: varianza a priori != varianza a posteriori
+fprintf("Varianza de la unidad de peso:\n")
+fprintf("vtpv: %.4f\n", vtpv)
+fprintf("s02: %.4f\n", s02)
+disp(" ")
+fprintf("Valores de Chi2:\n")
+fprintf("Límite inferior Chi2: %.4f\n", chi2_0)
+fprintf("Valor Chi2: %.4f\n", chi2)
+fprintf("Límite superior Chi2: %.4f\n", chi2_1)
+disp(" ")
 if (chi2 > chi2_0)&&(chi2 < chi2_1)
     disp("Se acepta H0. Se da por bueno el modelo")
 else
@@ -161,5 +170,18 @@ fprintf("Desplazamiento en y: %.4f\n", x(4))
 
 disp(" ")
 
+%Se debe deshacer el cambio de variable y aplicar la propagación de
+%varianzas y covarianzas
 disp("Matriz de varianzas y covarianzas:")
-disp(double(Exx))
+Jcov = [-x(2)/(x(1)^2+x(2)^2) x(1)/(x(1)^2+x(2)^2) 0 0; 1/cos(rotacion) 0 0 0; 0 0 1 0;0 0 0 1];
+Exx = Jcov*Exx*Jcov'
+disp("Desviaciones típicas:")
+sx = sqrt(diag(Exx));
+dta = sx(1)*180/pi*3600;
+fprintf("De la rotación: %.4f\n", dta)
+dtL = sx(2)*1.0e6;
+fprintf("De la escala: %.4f\n", dtL)
+dtTx = sx(3)*1000;
+fprintf("De la traslación en X: %.4f\n", dtTx)
+dtTy = sx(4)*1000;
+fprintf("De la traslación en Y: %.4f\n", dtTy)
